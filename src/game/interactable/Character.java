@@ -19,8 +19,9 @@ import game.Inventory;
 
 public class Character extends Living implements Collidable {
 	
+	private boolean facingRight = true;
 	public static enum State {
-		IDLE(0), WALK_LEFT(1), WALK_RIGHT(2);
+		IDLE_LEFT(0), IDLE_RIGHT(1), WALK_LEFT(2), WALK_RIGHT(3);
 		
 		public int id;
 		private State(int id) {
@@ -30,8 +31,8 @@ public class Character extends Living implements Collidable {
 	
 	private Collider collider;
 	
-	private Animation[] animations = new Animation[3];
-	private float[] origLengths = new float[3];
+	private Animation[] animations = new Animation[4];
+	private float[] origLengths = new float[4];
 	private State currentState;
 	
 	private float sprintFactor = 2;
@@ -43,14 +44,11 @@ public class Character extends Living implements Collidable {
 	
 	private Inventory inventory;
 	
-	public Character(Animation idle, Animation walkLeft, Animation walkRight, CollisionManager manager, Inventory inventory) {
+	public Character(Animation[] animations, CollisionManager manager, Inventory inventory) {
 		super(0, 0, true);
-		animations[0] = idle;
-		origLengths[0] = idle.getAnimTime();
-		animations[1] = walkLeft;
-		origLengths[1] = walkLeft.getAnimTime();
-		animations[2] = walkRight;
-		origLengths[2] = walkRight.getAnimTime();
+		this.animations = animations;
+		for(int i = 0; i < animations.length; i++)
+			origLengths[i] = animations[i].getAnimTime();
 		for(Animation anim : animations)
 			anim.setShadowType(ShadowType.FADE);
 		
@@ -58,14 +56,14 @@ public class Character extends Living implements Collidable {
 		
 		this.manager = manager;
 		
-		collider = new Collider(0, 0, idle.getWidth(0), idle.getHeight(0), "player");
+		collider = new Collider(0, 0, animations[0].getWidth(0), animations[0].getHeight(0), "player");
 		manager.addCollidable(this);
 		
 		this.inventory = inventory;
 	}
 	
-	public Character(Animation idle, Animation walkLeft, Animation walkRight, float x, float y, CollisionManager manager, Inventory inventory) {
-		this(idle, walkLeft, walkRight, manager, inventory);
+	public Character(Animation[] animations, float x, float y, CollisionManager manager, Inventory inventory) {
+		this(animations, manager, inventory);
 		super.setPos(x, y);
 		collider.setPos(x, y);
 	}
@@ -105,11 +103,13 @@ public class Character extends Living implements Collidable {
 		if(Input.isKey(KeyEvent.VK_A)) {
 			super.setX(super.getX() - timePassed * 50 * (isSprinting ? sprintFactor : 1));
 			setState(Character.State.WALK_LEFT);
+			facingRight = false;
 		} else if(Input.isKey(KeyEvent.VK_D)) {
 			super.setX(super.getX() + timePassed * 50 * (isSprinting ? sprintFactor : 1));
 			setState(Character.State.WALK_RIGHT);
+			facingRight = true;
 		} else
-			setState(Character.State.IDLE);
+			setState(facingRight ? Character.State.IDLE_RIGHT : Character.State.IDLE_LEFT);
 		if(Input.isKeyPressed(KeyEvent.VK_SPACE) && grounded)
 			super.verticalSpeed += Physics.GRAVITY * 0.5f;
 		

@@ -114,7 +114,12 @@ public class ScrollPanel implements UIElement {
 	//TODO: Make these more accurate, center on X.
 	@Override
 	public void setY(float y) {
-		bounds.y = (int)y;
+		float deltaY = (int)(y - this.y);
+		for(UIElement element : elements)
+			element.setY(element.getY() + deltaY);
+		bounds.y += deltaY;
+		scrollY += deltaY;
+		this.y += deltaY;
 	}
 
 	@Override
@@ -134,7 +139,12 @@ public class ScrollPanel implements UIElement {
 
 	@Override
 	public void setX(float x) {
-		bounds.x = (int)x;
+		float deltaX = (int)(x - bounds.x);
+		for(UIElement element : elements)
+			element.setX(element.getX() + deltaX);
+		bounds.x += deltaX;
+		origX += deltaX;
+		this.x += deltaX;
 	}
 
 	@Override

@@ -44,7 +44,7 @@ public class CheckBox implements UIElement {
 
 	@Override
 	public float getY() {
-		return y;
+		return getTop();
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class CheckBox implements UIElement {
 
 	@Override
 	public float getX() {
-		return x;
+		return x + (getRight() - getLeft())/2.0f;
 	}
 
 	@Override

@@ -105,6 +105,6 @@ public class Button implements UIElement {
 
 	@Override
 	public float getX() {
-		return x;
+		return x + (getRight() - getLeft())/2.0f;
 	}
 }

@@ -147,7 +147,7 @@ public class Slider implements UIElement {
 
 	@Override
 	public float getY() {
-		return y;
+		return getTop();
 	}
 
 	@Override
@@ -163,10 +163,11 @@ public class Slider implements UIElement {
 	@Override
 	public void setX(float x) {
 		this.x += x - getLeft() - (getRight() - getLeft())/2.0f;
+		this.sliderX = this.x + slideWidth * (this.value - minValue)/(maxValue - minValue) - sliderWidth/2.0f;
 	}
 
 	@Override
 	public float getX() {
-		return x;
+		return x + (getRight() - getLeft())/2.0f;
 	}
 }

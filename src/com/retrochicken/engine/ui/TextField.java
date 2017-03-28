@@ -56,7 +56,7 @@ public class TextField implements UIElement {
 
 	@Override
 	public float getY() {
-		return y;
+		return getTop();
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class TextField implements UIElement {
 
 	@Override
 	public float getX() {
-		return x;
+		return x + getLeft() + (getRight() - getLeft())/2.0f;
 	}
 
 	@Override

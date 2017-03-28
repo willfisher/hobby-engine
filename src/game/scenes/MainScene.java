@@ -56,6 +56,8 @@ public class MainScene implements Scene {
 	
 	private CraftingManager craftingManager;
 	
+	private PauseMenu pauseMenu;
+	
 	public void addGameObject(GameObject obj) {
 		gameObjects.add(obj);
 	}
@@ -89,9 +91,10 @@ public class MainScene implements Scene {
 		this.width = gc.getWidth();
 		this.height = gc.getHeight();
 		SpriteSheet paulSprite = new SpriteSheet("/characters/paulchar.png");
-		paul = new Character(new Animation(paulSprite, new int[]{0}, 5),
+		paul = new Character(new Animation[]{new Animation(paulSprite, new int[]{0}, 5, true),
+							 new Animation(paulSprite, new int[]{0}, 5),
 							 new Animation(paulSprite, new int[]{1, 2, 3, 4}, 0.5f, true),
-							 new Animation(paulSprite, new int[]{1, 2, 3, 4}, 0.5f),
+							 new Animation(paulSprite, new int[]{1, 2, 3, 4}, 0.5f)},
 							 50, 50, collisionManager, inventory);
 		
 		grass = new CollidableImage("/environment/tileset_dirt_and_grass_1.png", collisionManager);
@@ -101,11 +104,20 @@ public class MainScene implements Scene {
 		
 		clip.setVolumeStandard(75);
 		
+		pauseMenu = new PauseMenu(gc.getWidth()/2.0f, 20, 0, 150, gc);
+		
 		this.sManager = sManager;
 	}
 	
 	@Override
 	public void update(float timePassed) {
+		if(Input.isKeyPressed(KeyEvent.VK_ESCAPE))
+			pauseMenu.setVisible(!pauseMenu.isVisible());
+		
+		pauseMenu.update();
+		if(pauseMenu.isVisible())
+			return;
+		
 		if(Input.isKeyPressed(KeyEvent.VK_V)) {
 			gameObjects.add((new CraftableItems(this)).new Wood(Input.getMouseX(), Input.getMouseY(), getCollisionManager()));
 		}
@@ -158,7 +170,7 @@ public class MainScene implements Scene {
 	}
 
 	@Override
-	public void render(GameContainer gc, Renderer renderer) {
+	public void render(GameContainer gc, Renderer renderer) {	
 		for(GameObject obj : gameObjects)
 			obj.render(renderer);
 		for(Living obj : enemies)
@@ -176,6 +188,8 @@ public class MainScene implements Scene {
 			renderer.drawTransparentRect(Settings.SELECT_COLOR, 0.5f, (int)Math.min(Input.getMouseX(), selectX), (int)Math.min(Input.getMouseY(), selectY), width, height);
 		}
 		//collisionManager.debug(renderer);
+		
+		pauseMenu.render(renderer);
 	}
 
 	@Override
