@@ -2,6 +2,8 @@ package com.retrochicken.engine;
 
 import java.awt.event.KeyEvent;
 
+import com.retrochicken.engine.fx.Settings;
+
 public class GameContainer implements Runnable {
 	
 	private Thread thread;
@@ -11,7 +13,7 @@ public class GameContainer implements Runnable {
 	private Input input;
 	
 	private int width = 320, height = 240;
-	private float scale = 2.0f;
+	private float scale = Settings.RES_SCALE;
 	private String title = "HobbyEngine v1.0 by Will Fisher";
 	private double frameCap = 1.0/60.0;
 	private boolean isRunning = false;

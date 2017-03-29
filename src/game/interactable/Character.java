@@ -21,7 +21,7 @@ public class Character extends Living implements Collidable {
 	
 	private boolean facingRight = true;
 	public static enum State {
-		IDLE_LEFT(0), IDLE_RIGHT(1), WALK_LEFT(2), WALK_RIGHT(3);
+		IDLE_LEFT(0), IDLE_RIGHT(1), WALK_LEFT(2), WALK_RIGHT(3), ATTACKING(4);
 		
 		public int id;
 		private State(int id) {
@@ -31,9 +31,12 @@ public class Character extends Living implements Collidable {
 	
 	private Collider collider;
 	
-	private Animation[] animations = new Animation[4];
-	private float[] origLengths = new float[4];
+	private Animation[] animations;
+	private float[] origLengths;
 	private State currentState;
+	
+	private Animation[][] attackAnimations;
+	private int currentAttack;
 	
 	private float sprintFactor = 2;
 	private boolean isSprinting = false;
@@ -44,9 +47,11 @@ public class Character extends Living implements Collidable {
 	
 	private Inventory inventory;
 	
-	public Character(Animation[] animations, CollisionManager manager, Inventory inventory) {
+	public Character(Animation[] animations, Animation[][] attackAnimations, CollisionManager manager, Inventory inventory) {
 		super(0, 0, true);
+		this.attackAnimations = attackAnimations;
 		this.animations = animations;
+		origLengths = new float[animations.length];
 		for(int i = 0; i < animations.length; i++)
 			origLengths[i] = animations[i].getAnimTime();
 		for(Animation anim : animations)
@@ -62,8 +67,8 @@ public class Character extends Living implements Collidable {
 		this.inventory = inventory;
 	}
 	
-	public Character(Animation[] animations, float x, float y, CollisionManager manager, Inventory inventory) {
-		this(animations, manager, inventory);
+	public Character(Animation[] animations, Animation[][] attackAnimations, float x, float y, CollisionManager manager, Inventory inventory) {
+		this(animations, attackAnimations, manager, inventory);
 		super.setPos(x, y);
 		collider.setPos(x, y);
 	}
@@ -113,10 +118,17 @@ public class Character extends Living implements Collidable {
 		if(Input.isKeyPressed(KeyEvent.VK_SPACE) && grounded)
 			super.verticalSpeed += Physics.GRAVITY * 0.5f;
 		
-		if(Input.isKeyPressed(KeyEvent.VK_E))
+		if(Input.isKeyPressed(KeyEvent.VK_RIGHT))
 			consumables.add(new Bullet(super.getX() + getWidth() + 10, super.getY() + animations[0].getHeight()/4.0f, 25, true, manager));
-		if(Input.isKeyPressed(KeyEvent.VK_Q))
+		if(Input.isKeyPressed(KeyEvent.VK_LEFT))
 			consumables.add(new Bullet(super.getX() - 10 - Bullet.IMAGE.width, super.getY() + animations[0].getHeight()/4.0f, 25, false, manager));
+		if(Input.isKeyPressed(KeyEvent.VK_UP))
+			currentAttack = (currentAttack + 1) % attackAnimations.length;
+		if(Input.isKeyPressed(KeyEvent.VK_DOWN)) {
+			currentAttack -= 1;
+			if(currentAttack < 0)
+				currentAttack = attackAnimations.length - currentAttack;
+		}
 		
 		
 		if(Input.isKey(KeyEvent.VK_SHIFT))
